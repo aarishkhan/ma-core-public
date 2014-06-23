@@ -28,9 +28,8 @@
         }
     });
   </script>
-  <table cellspacing="0" cellpadding="0" border="0">
-    <tr>
-      <td>
+    <div class="rowBoot col-xs-12 no-padding-left-right no-margin-left-right">
+    <div class="col-md-3 no-padding-left-right no-margin-left-right">
         <form id="loginForm" action="login.htm" method="post">
           <table>
             <spring:bind path="login.username">
@@ -72,23 +71,27 @@
             </tr>
           </table>
         </form>
-        <br/>
-      </td>
-      <td valign="top">
+    </div>
+
+       <div class="col-lg-5">
         <table>
           <tr>
             <td valign="top"><img id="browserImg" src="images/magnifier.png"/></td>
-            <td><b><span id="browser"><fmt:message key="login.unknownBrowser"/></span></b></td>
+
+            <td valign="top" colspan="2">
+            <b><span id="browser"><fmt:message key="login.unknownBrowser"/></span></b>
+            <br>
+            <span id="okMsg" style="display:none"><fmt:message key="login.supportedBrowser"/></span>
+            <span id="warnMsg" style="display:none"><fmt:message key="login.unsupportedBrowser"/></span>
+            </td>
           </tr>
           <tr>
-            <td valign="top" colspan="2">
-              <span id="okMsg" style="display:none"><fmt:message key="login.supportedBrowser"/></span>
-              <span id="warnMsg" style="display:none"><fmt:message key="login.unsupportedBrowser"/></span>
-            </td>
+
           </tr>
         </table>
         <br/><br/>
-      </td>
-    </tr>
-  </table>
-</tag:page>
+    </div>
+
+    </div>
+
+    </tag:page>

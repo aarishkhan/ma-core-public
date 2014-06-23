@@ -30,9 +30,10 @@ function hMD(desc, source) {
     var c = $("headerMenuDescription");
     if (desc) {
         var srcPosition = dojo.position(source, true);
+        console.log(srcPosition.y+"this is the all out position")
         c.innerHTML = desc;
         c.style.left = (srcPosition.x + 16) +"px";
-        c.style.top = (srcPosition.y - 10) +"px";
+        c.style.top = (srcPosition.y - 50) +"px";
         show(c);
         
         // Check the window bound.

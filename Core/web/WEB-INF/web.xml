@@ -166,14 +166,9 @@
     <servlet-name>dwr-invoker</servlet-name>
     <servlet-class>org.directwebremoting.servlet.DwrServlet</servlet-class>
     <init-param>
-      <description>Necessary for testing existing dwr creators, no performance hit</description>
       <param-name>debug</param-name>
       <param-value>true</param-value>
     </init-param>
-    <init-param>
-      <param-name>activeReverseAjaxEnabled</param-name>
-      <param-value>true</param-value>
-    </init-param>    
     <init-param>
       <param-name>publishContainerAs</param-name>
       <param-value>DwrContainer</param-value>
@@ -214,11 +209,7 @@
     <servlet-class>com.serotonin.m2m2.web.servlet.EventExportServlet</servlet-class>
   </servlet>
   
-  <servlet>
-    <servlet-name>mangoStatus</servlet-name>
-    <servlet-class>com.serotonin.m2m2.web.servlet.StatusServlet</servlet-class>
-  </servlet>
-  
+
   <!-- 
     Servlet mappings.
    -->
@@ -261,11 +252,7 @@
     <servlet-name>eventExport</servlet-name>
     <url-pattern>/eventExport/*</url-pattern>
   </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>mangoStatus</servlet-name>
-    <url-pattern>/status/*</url-pattern>
-  </servlet-mapping> 
+ 
   
   <!-- 
     Context listeners.

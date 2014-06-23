@@ -361,8 +361,13 @@
         setDisabled("infoBtn", true);
     }
     
-
-   
+    function purgeNow() {
+        SystemSettingsDwr.purgeNow(function() {
+            stopImageFader("purgeNowImg");
+            dbSizeUpdate();
+        });
+        startImageFader("purgeNowImg");
+    }
     
     function saveLangSettings() {
         SystemSettingsDwr.saveLanguageSettings($get("<c:out value="<%= SystemSettingsDao.LANGUAGE %>"/>"), function() {
@@ -373,30 +378,10 @@
         setDisabled("saveLangSettingsBtn", true);
     }
     
-    function checkPurgeNow() {
-        if (confirm("<fmt:message key='systemSettings.purgeDataWithPurgeSettingsConfirm'/>")) {
-            SystemSettingsDwr.purgeNow(function(msg) {
-                stopImageFader("purgeNowImg");
-                dbSizeUpdate();
-            });
-            startImageFader("purgeNowImg");
-        }
-    }
-    
-    function checkPurgeAllPointValuesNow() {
+    function checkPurgeAllData() {
         if (confirm("<fmt:message key="systemSettings.purgeDataConfirm"/>")) {
             setUserMessage("miscMessage", "<fmt:message key="systemSettings.purgeDataInProgress"/>");
             SystemSettingsDwr.purgeAllData(function(msg) {
-                setUserMessage("miscMessage", msg);
-                dbSizeUpdate();
-            });
-        }
-    }
-    
-    function checkPurgeAllEventsNow(){
-        if (confirm("<fmt:message key='systemSettings.purgeAllEventsConfirm'/>")) {
-            setUserMessage("miscMessage", "<fmt:message key='systemSettings.purgeAllEventsInProgress'/>");
-            SystemSettingsDwr.purgeAllEvents(function(msg) {
                 setUserMessage("miscMessage", msg);
                 dbSizeUpdate();
             });
@@ -454,7 +439,7 @@
         <td class="formField">
           <span id="databaseSize"></span>
           <tag:img id="refreshImg" png="control_repeat_blue" onclick="dbSizeUpdate();" title="common.refresh"/>
-          <tag:img id="purgeNowImg" png="bin" onclick="checkPurgeNow()" title="systemSettings.purgeNow"/>
+          <tag:img id="purgeNowImg" png="bin" onclick="purgeNow()" title="systemSettings.purgeNow"/>
         </td>
       </tr>
       <tr id="noSqlDatabaseSizeRow"  style="display:none">
@@ -758,9 +743,8 @@
       <tr>
         <td colspan="2" align="center">
           <input id="saveMiscSettingsBtn" type="button" value="<fmt:message key="common.save"/>" onclick="saveMiscSettings()"/>
-          <input type="button" value="<fmt:message key="systemSettings.purgeData"/>" onclick="checkPurgeAllPointValuesNow()"/>
-          <input type="button" value='<fmt:message key="systemSettings.purgeAllEvents"/>' onclick="checkPurgeAllEventsNow();"/>
-          <input type="button" value='<fmt:message key="systemSettings.purgeNow"/>' onclick="checkPurgeNow();"/>
+          <input type="button" value="<fmt:message key="systemSettings.purgeData"/>" onclick="checkPurgeAllData()"/>
+          <input type="button" value='<fmt:message key="systemSettings.purgeNow"/>' onclick="purgeNow();"/>
           <tag:help id="otherSettings"/>
         </td>
       </tr>

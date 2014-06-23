@@ -299,8 +299,10 @@ function isShowing(node) {
 
 function showMenu(node, left, top, right, bottom) {
     node = getNodeIfString(node);
+    console.log("also a node"+node);
     var bounds = dojo.position(node.parentNode);
-    var anc = findRelativeAncestor(node);
+   var anc= findRelativeAncestor(node);
+
     if (anc) {
         var rbounds = dojo.position(anc);
         // marginBox
@@ -1009,6 +1011,8 @@ function ackEvent(eventId) {
 
 //
 ///
+
+
 /// Sharing (views and watch lists)
 ///
 //

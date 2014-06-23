@@ -66,7 +66,7 @@
               alert("<fmt:message key="pointDetails.recordCountError"/>");
           else {
               startImageFader($("historyLimitImg"));
-              DataPointDetailsDwr.getHistoryTableData(limit, $get("usePointCache"), function(response) {
+              DataPointDetailsDwr.getHistoryTableData(limit, function(response) {
                   var data = response.data.history;
                   dwr.util.removeAllRows("historyTableData");
                   if (!data || data.length == 0)
@@ -91,22 +91,197 @@
               });
           }
       }
+    //
+    //date Time Picker
+    //
+
+
+    function getDateTimeFromInputTags(origin){
+
+    var DateElement=document.getElementById('dateTimePicker-'+origin+'');
+    var Year=$get(""+origin+"Year");
+    var Month=$get(""+origin+"Month");
+    var Day= $get(""+origin+"Day");
+    var Hour= $get(""+origin+"Hour");
+    var Minute=$get(""+origin+"Minute");
+    var Second=$get(""+origin+"Second");
+    //var fromNone= $get("fromNone"),
+    var dateString=""+Month+"-"+Day+"-"+Year+" "+Hour+":"+Minute+":"+Second+"";
+    console.log(dateString);
+
+    DateElement.value=dateString;
+    }
+    function setDateTimeToInputTags(origin){
+    var DateElement=document.getElementById('dateTimePicker-'+origin+'');
+    var value= DateElement.value;
+    var dateTimeArray=value.split(" ");
+    var date=dateTimeArray[0].split("-");
+    var time=dateTimeArray[1].split(":");
+    var day=date[1];
+    var month=date[0];
+    var year=date[2];
+    var hour=time[0];
+    var minute=time[1];
+    var second=time[2];
+    $set(""+origin+"Year",year);
+    $set(""+origin+"Month",parseInt(month));
+    console.log(""+origin+"Month"+"value"+month);
+    $set(""+origin+"Day",day);
+    $set(""+origin+"Hour",hour);
+    $set(""+origin+"Minute",minute);
+    $set(""+origin+"Second",second);
+    console.log("i am called sire")
+
+
+    }
+
+
+
+
+
       
       //
       // Image chart
       //
       function getImageChart() {
-          var width = dojo.contentBox($("imageChartDiv")).w - 20;
-          DataPointDetailsDwr.getImageChartData($get("fromYear"), $get("fromMonth"), $get("fromDay"), $get("fromHour"),
+          var width =document.getElementById('chart-container').clientWidth-10;// dojo.contentBox($("imageChartDiv")).w - 20;
+    console.log('selector value'+ $("imageChartDiv")
+    +"and"+dojo.contentBox($("imageChartDiv")).w)
+    console.log(width)
+             DataPointDetailsDwr.getImageChartData($get("fromYear"), $get("fromMonth"), $get("fromDay"), $get("fromHour"),
                 $get("fromMinute"), $get("fromSecond"), $get("fromNone"), $get("toYear"), $get("toMonth"), 
                 $get("toDay"), $get("toHour"), $get("toMinute"), $get("toSecond"), $get("toNone"), width, 350, function(response) {
-              $("imageChartDiv").innerHTML = response.data.chart;
-              $("imageChartAsof").innerHTML = response.data.asof;
+            //  $("imageChartDiv").innerHTML = response.data.chart;
+             // $("imageChartAsof").innerHTML = response.data.asof;
+
+    //rickshaw graph
+
+    var glycolgraphcont=$j('#imageChartDiv').width();
+    console.log(glycolgraphcont)
+    var widthAxis=glycolgraphcont*0.07;
+    var widthGraph=glycolgraphcont*0.78;
+    $j('#axis0').width(widthAxis);
+    $j('#axis1').width(widthAxis);
+    $j('#chart').width(widthGraph);
+    //  $( "#slider-range" ).slider({
+    //      range: true
+    // });
+
+    var data, graph, i, max, min, point, random, scales, series, _i, _j, _k, _l, _len, _len1, _len2, _ref;
+    var parsedData=[];
+    data = [[], []];
+    $j.ajax({
+    url: "http://localhost:8080/basicapi?oldapi=ft_1399932094816_1399845660000_-1_1.png",
+
+    success: function(pointList){
+    var resultObj=JSON.parse(pointList);
+    makeGraphData(resultObj);
+    }
+    });
+    function makeGraphData(data){
+    for(var x=0;x<10;x++){
+        parsedData.push({x:data.Temp.times[x],y:data.Temp.values[x]})
+
+    }
+    }
+
+
+
+   random = new Rickshaw.Fixtures.RandomData(12 * 60 * 60);
+
+    for (i = _i = 0; _i < 100; i = ++_i) {
+    random.addData(data);
+    }
+    //window.jsonData=data;
+    console.log("this is the data:"+ data);
+    scales = [];
+
+    _ref = data[1];
+    for (_j = 0, _len = _ref.length; _j < _len; _j++) {
+    point = _ref[_j];
+    point.y *= point.y;
+    }
+
+    for (_k = 0, _len1 = data.length; _k < _len1; _k++) {
+    series = data[_k];
+    min = Number.MAX_VALUE;
+    max = Number.MIN_VALUE;
+    for (_l = 0, _len2 = series.length; _l < _len2; _l++) {
+    point = series[_l];
+    min = Math.min(min, point.y);
+    max = Math.max(max, point.y);
+    }
+    if (_k === 0) {
+    scales.push(d3.scale.linear().domain([min, max]).nice());
+    } else {
+    scales.push(d3.scale.pow().domain([min, max]).nice());
+    }
+    }
+
+    graph = new Rickshaw.Graph({
+    element: document.getElementById("chart"),
+    renderer: 'line',height:250,width:widthGraph,
+    series: [
+    {
+    color: 'red',
+    data: data[0],
+    name: 'GlycolTemperature',
+    scale: scales[0]
+    }
+    ]
+    });
+
+    new Rickshaw.Graph.Axis.Y.Scaled({
+    element: document.getElementById('axis0'),
+    graph: graph,
+    orientation: 'left',
+    scale: scales[0],
+    tickFormat: Rickshaw.Fixtures.Number.formatKMBT
+    });
+
+
+
+    new Rickshaw.Graph.Axis.Time({
+    graph: graph
+    });
+
+    new Rickshaw.Graph.HoverDetail({
+    graph: graph
+    });
+    new Rickshaw.Graph.RangeSlider({
+    graph: graph,
+    element: document.getElementById("slider-range")
+    });
+
+    graph.render();
+
+
+
+
+
+
+
+
+
               stopImageFader($("imageChartImg"));
+              getDateTimeFromInputTags('from');
+                getDateTimeFromInputTags('to');
+
+
+
+
           });
+
           startImageFader($("imageChartImg"));
       }
-      
+
+
+
+
+
+
+
+
       function getChartData() {
           startImageFader($("chartDataImg"));
           DataPointDetailsDwr.getChartData($get("fromYear"), $get("fromMonth"), $get("fromDay"), $get("fromHour"),
@@ -116,8 +291,27 @@
               var downloadTypeSelect = dijit.byId("downloadTypeSelect");
               var downloadUrl = "chartExport/pointData" + downloadTypeSelect.get('value');
               window.location = downloadUrl;
+
           });          
       }
+    //download chart
+
+    function saveImage(){
+
+
+    SVGinitiator(document.getElementsByTagName('svg')[0],document.getElementsByTagName('svg')[1],"diagram.png", 1);
+    }
+
+
+
+
+
+
+
+
+
+
+
       
       //
       // Stats chart
@@ -136,6 +330,7 @@
                   stopImageFader($("statsChartImg"));
               });
           }
+
       }
       
       function togglePanel(img, panelId) {
@@ -188,6 +383,7 @@
             });
           </c:if>
       }
+
     </script>
   </c:if>
       
@@ -217,15 +413,15 @@
     <c:when test="${empty point && !empty currentXid}"><m2m2:translate key="pointDetails.pointNotFound"/></c:when>
     <c:when test="${empty point}"><m2m2:translate key="pointDetails.noPoints"/></c:when>
     <c:otherwise>
-      <table width="100%" cellspacing="0" cellpadding="0">
-        <tr>
-          <td valign="top">
+     <div class=" no-margin-left-right page-container">
+    <div class="rowBoot no-margin-left-right ">
+    <div class="col-lg-5 no-padding-left-right ">
             <div class="borderDiv marB marR">
               <table>
                 <tr>
                   <td class="smallTitle" colspan="2">
                     <tag:img png="icon_comp" title="common.point"/>
-                    ${point.extendedName}
+                   <span id='point-name'> ${point.extendedName}</span>
                     <c:if test="${pointEditor}">
                       <a href="data_point_edit.shtm?dpid=${point.id}"><tag:img png="icon_comp_edit" title="pointDetails.editPoint"/></a>
                       <a href="data_source_edit.shtm?dsid=${point.dataSourceId}&pid=${point.id}"><tag:img png="icon_ds_edit"
@@ -287,15 +483,14 @@
               </table>
               <div id="statsChartData" style="padding:0px 0px 5px 5px;"></div>
             </div>
-          </td>
+    </div>
           
-          <td valign="top">
+       <div class="col-lg-5 no-padding-left-right">
             <div class="borderDiv marB marR">
               <table width="100%">
                 <tr>
                   <td class="smallTitle"><fmt:message key="pointDetails.history"/></td>
                   <td id="historyTableAsof"></td>
-                  <td><sst:checkbox id="usePointCache" selectedValue="true"/>&nbsp<fmt:message key="pointDetails.useCache"/></td>
                   <td align="right">
                     <fmt:message key="pointDetails.show"/>
                     <input id="historyLimit" type="text" style="text-align:right;" value="${historyLimit}"
@@ -314,9 +509,9 @@
                 <tbody id="historyTableData"></tbody>
               </table>
             </div>
-          </td>
-          
-          <td valign="top">
+        </div>
+
+    <div class="col-lg-2 no-padding-left-right">
             <div class="borderDiv marB">
               <table width="100%">
                 <tr>
@@ -329,41 +524,54 @@
               </table>
               <table id="pointComments${point.id}"><tag:comments comments="${point.comments}"/></table>
             </div>
-          </td>
-        </tr>
-        
+     </div>
+
+    </div>
         <c:if test="${!empty periodType}">
-          <tr>
-            <td colspan="3">
+
+           <div class="rowBoot  no-margin-left-right">
               <!-- chart with editable properties and annotations -->
-              <div class="borderDiv marB">
-                <table width="100%">
-                  <tr>
-                    <td class="smallTitle"><fmt:message key="pointDetails.chart"/> &nbsp <tag:help id="chartServlet"/></td>
-                    <td id="imageChartAsof"></td>
-                    <td align="right"><tag:dateRange/></td>
-                    <td>
+              <div id="chart-container" class="col-lg-12 no-margin-left-right no-padding-left-right borderDiv marB">
+
+                  <div class="rowBoot col-lg-12 no-margin-left-right">
+                    <div>
+                    <div class="smallTitle"><fmt:message key="pointDetails.chart"/> &nbsp <tag:help id="chartServlet"/></div>
+                    <div id="imageChartAsof"></div>
+                     </div>
+
+                     <div class="rowBoot col-lg-12 no-padding-left-right no-margin-left-right"><tag:dateRange/></div>
+                    <div class="col-lg-2">
                       <tag:img id="imageChartImg" png="control_play_blue" title="pointDetails.imageChartButton"
                               onclick="getImageChart()"/>
                       <!-- TODO Add selectable type here xslx or csv, Maybe Create Tag... -->
                       <input id="downloadTypeSelect"></input>
                       <tag:img id="chartDataImg" png="bullet_down" title="pointDetails.chartDataButton"
                               onclick="getChartData()"/>
-                       
-                              
-                    </td>
-                  </tr>
-                  <tr><td colspan="4" id="imageChartDiv"></td></tr>
-                </table>
+
+
+                    </div>
+    <button class="btn btn-warning pull-right" id="save" onclick='saveImage()'>save As Image</button>
+                  </div>
+                  <div class="rowBoot col-lg-12 no-padding-left-right no-margin-left-right ">
+                    <div class="col-lg-12 no-padding-left-right" colspan="4" id="imageChartDiv">
+                    <div id="axis0"></div>
+                    <div id="chart"></div>
+
+                    <div id="slider-range"></div>
+
+                    </div>
+
+
+                 </div>
+
               </div>
-            </td>
-          </tr>
-        </c:if>
+            </div>
+
+    </c:if>
         
         <c:if test="${!empty flipbookLimit}">
-          <tr>
-            <td colspan="3">
-              <div class="borderDiv marB">
+    <div class="rowBoot no-padding-left-right no-margin-left-right">
+              <div class=" col-lg-12 no-margin-left-right borderDiv marB">
                 <table width="100%">
                   <tr>
                     <td class="smallTitle"><fmt:message key="pointDetails.flipbook"/></td>
@@ -380,13 +588,11 @@
                   <tr><td colspan="2"><img id="flipbookImage" src=""/></td></tr>
                 </table>
               </div>
-            </td>
-          </tr>
+          </div>
         </c:if>
-      
-        <tr>
-          <td colspan="3">
-            <div class="borderDiv marB">
+
+        <div class="rowBoot no-padding-left-right no-margin-left-right">
+            <div class="col-lg-12 no-margin-left-right borderDiv marB padding-toggle ">
               <table width="100%">
                 <tr>
                   <td class="smallTitle"><fmt:message key="pointDetails.events"/></td>
@@ -396,14 +602,14 @@
                   </td>
                 </tr>
               </table>
-              <table id="eventsTable" cellspacing="1" cellpadding="0" width="100%">
-                <tr class="rowHeader">
-                  <td><fmt:message key="pointDetails.id"/></td>
-                  <td><fmt:message key="common.alarmLevel"/></td>
-                  <td><fmt:message key="common.activeTime"/></td>
-                  <td><fmt:message key="pointDetails.message"/></td>
-                  <td><fmt:message key="common.status"/></td>
-                  <td><fmt:message key="events.acknowledged"/></td>
+              <table class="col-lg-12 padding-toggle" id="eventsTable" cellspacing="1" cellpadding="0" >
+                <tr class="col-lg-12  no-padding-left-right">
+                  <td class="col-xs-1 no-padding-left-right events-Table-Data-Point-header-Text"><fmt:message key="pointDetails.id"/></td>
+                  <td class="col-xs-3 no-padding-left-right events-Table-Data-Point-header-Text"><fmt:message key="common.alarmLevel"/></td>
+                  <td class="col-xs-3 no-padding-left-right events-Table-Data-Point-header-Text"><fmt:message key="common.activeTime"/></td>
+                  <td class="col-xs-2 no-padding-left-right events-Table-Data-Point-header-Text"><fmt:message key="pointDetails.message"/></td>
+                  <td class="col-xs-2 no-padding-left-right events-Table-Data-Point-header-Text"><fmt:message key="common.status"/></td>
+                  <td class="col-xs-3 no-padding-left-right events-Table-Data-Point-header-Text"><fmt:message key="events.acknowledged"/></td>
                 </tr>
                 
                 <c:forEach items="${events}" var="event" varStatus="status" end="19">
@@ -458,48 +664,49 @@
                   </tr>
                 </c:forEach>
                 <c:if test="${sst:size(events) > 20}">
-                  <tr class="row"><td align="center" colspan="6"><fmt:message key="pointDetails.maxEvents"/> ${sst:size(events)}</td></tr>
+                  <tr class="rowBoot"><td align="center" colspan="6"><fmt:message key="pointDetails.maxEvents"/> ${sst:size(events)}</td></tr>
                 </c:if>
                 <c:if test="${empty events}">
-                  <tr class="row"><td colspan="6"><fmt:message key="events.emptyList"/></td></tr>
+                  <tr class="rowBoot"><td colspan="6"><fmt:message key="events.emptyList"/></td></tr>
                 </c:if>
               </table>
             </div>
-          </td>
-        </tr>
-        
-        <tr>
-          <td colspan="3" valign="top">
-            <div class="borderDiv">
-              <span class="smallTitle" style="margin:3px;"><fmt:message key="pointDetails.userAccess"/></span>
-              <table width="100%" cellspacing="1">
-                <tr class="rowHeader">
-                  <td width="16"></td>
-                  <td><fmt:message key="pointDetails.username"/></td>
-                  <td><fmt:message key="pointDetails.accessType"/></td>
-                </tr>
-                <c:forEach items="${users}" var="userData" varStatus="status">
-                  <tr class="row<c:if test="${status.index % 2 == 1}">Alt</c:if>">
-                    <c:set var="user" value="${userData.user}"/>
-                    <td><%@ include file="/WEB-INF/snippet/userIcon.jsp" %></td>
-                    <td>${user.username}</td>
-                    <td>
-                      <c:choose>
-                        <c:when test="${userData.accessType == applicationScope['constants.Permissions.DataPointAccessTypes.READ']}"><fmt:message key="common.access.read"/></c:when>
-                        <c:when test="${userData.accessType == applicationScope['constants.Permissions.DataPointAccessTypes.SET']}"><fmt:message key="common.access.set"/></c:when>
-                        <c:when test="${userData.accessType == applicationScope['constants.Permissions.DataPointAccessTypes.DATA_SOURCE']}"><fmt:message key="common.access.dataSource"/></c:when>
-                        <c:when test="${userData.accessType == applicationScope['constants.Permissions.DataPointAccessTypes.ADMIN']}"><fmt:message key="common.access.admin"/></c:when>
-                        <c:otherwise><fmt:message key="common.unknown"/> (${userData.accessType})</c:otherwise>
-                      </c:choose>
-                    </td>
-                  </tr>
-                </c:forEach>
-              </table>
-            </div>
-          </td>
-        </tr>
-      </table>
-      
+      </div>
+
+
+
+
+
+
+        <div  class="rowBoot no-padding-left-right no-margin-left-right">
+                <div class=" col-lg-12 no-margin-left-right borderDiv">
+                  <span class="col-lg-12 no-margin-left-right smallTitle" style="margin:3px;"><fmt:message key="pointDetails.userAccess"/></span>
+                  <table width="100%" cellspacing="1">
+                    <tr class="rowHeader">
+                      <td width="16"></td>
+                      <td><fmt:message key="pointDetails.username"/></td>
+                      <td><fmt:message key="pointDetails.accessType"/></td>
+                    </tr>
+                    <c:forEach items="${users}" var="userData" varStatus="status">
+                      <tr class="row<c:if test="${status.index % 2 == 1}">Alt</c:if>">
+                        <c:set var="user" value="${userData.user}"/>
+                        <td><%@ include file="/WEB-INF/snippet/userIcon.jsp" %></td>
+                        <td>${user.username}</td>
+                        <td>
+                          <c:choose>
+                            <c:when test="${userData.accessType == applicationScope['constants.Permissions.DataPointAccessTypes.READ']}"><fmt:message key="common.access.read"/></c:when>
+                            <c:when test="${userData.accessType == applicationScope['constants.Permissions.DataPointAccessTypes.SET']}"><fmt:message key="common.access.set"/></c:when>
+                            <c:when test="${userData.accessType == applicationScope['constants.Permissions.DataPointAccessTypes.DATA_SOURCE']}"><fmt:message key="common.access.dataSource"/></c:when>
+                            <c:when test="${userData.accessType == applicationScope['constants.Permissions.DataPointAccessTypes.ADMIN']}"><fmt:message key="common.access.admin"/></c:when>
+                            <c:otherwise><fmt:message key="common.unknown"/> (${userData.accessType})</c:otherwise>
+                          </c:choose>
+                        </td>
+                      </tr>
+                    </c:forEach>
+                  </table>
+                </div>
+        </div>
+    </div>
       <%@ include file="/WEB-INF/jsp/include/userComment.jsp" %>
     </c:otherwise>
   </c:choose>
@@ -510,4 +717,5 @@
     <c:forEach items="${userPoints}" var="point">{id:${point.id},name:"${sst:dquotEncode(point.extendedName)}"},
     </c:forEach>
   ];
+
 </script>

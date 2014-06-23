@@ -8,14 +8,16 @@
 
 
 <c:if test="${!simple}">
-  <table width="100%" cellspacing="0" cellpadding="0" border="0" id="subHeader" 
+
+
+  <table class="col-lg-12" width="100%" cellspacing="0" cellpadding="0" border="0" id="subHeader" >
   <c:if test="${!empty showToolbar}">
   <c:choose>
     <c:when test="${showToolbar == false}">style="display:none;"</c:when>
     <c:otherwise></c:otherwise>
   </c:choose>
   </c:if>
-  >
+
   
     <tr>
       <td style="cursor:default">
@@ -59,7 +61,7 @@
           <span class="copyTitle"><fmt:message key="header.user"/>: <b>${sessionUser.username}</b></span>
           <m2m2:menuItem id="logoutMi" href="/logout.htm" png="control-power" key="header.logout"/>
           <tag:img id="userMutedImg" onclick="MiscDwr.toggleUserMuted(setUserMuted)" onmouseover="hideLayersIgnoreMissing('userHome', 'localeEdit')"/>
-          <div style="display: inline;" onmouseover="hideLayersIgnoreMissing('localeEdit'); showMenu('userHome', null, 10, 10);">
+          <div style="display: inline;" onmouseover="hideLayersIgnoreMissing('localeEdit'); showMenu('userHome', null, -50, 0);">
             <tag:img png="house" title="header.goHomeUrl" onclick="goHomeUrl();"/>
             <div id="userHome" style="visibility:hidden;left:0px;top:15px;" class="labelDiv" onmouseout="hideLayer(this)">
               <tag:img png="house_link" title="header.setHomeUrl" onclick="setHomeUrl()" onmouseover="hideLayersIgnoreMissing('localeEdit')"/>
@@ -80,4 +82,5 @@
       </td>
     </tr>
   </table>
+
 </c:if>
