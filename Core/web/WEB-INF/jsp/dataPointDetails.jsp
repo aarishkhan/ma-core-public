@@ -298,8 +298,11 @@
 
     function saveImage(){
 
-
-    SVGinitiator(document.getElementsByTagName('svg')[0],document.getElementsByTagName('svg')[1],"diagram.png", 1);
+    if (!document.getElementsByTagName('svg')[1].children){
+    SVGinitiatorIE(document.getElementsByTagName('svg')[0],document.getElementsByTagName('svg')[1],"diagram.png", 1);
+    }
+    else{
+    SVGinitiator(document.getElementsByTagName('svg')[0],document.getElementsByTagName('svg')[1],"diagram.png", 1);}
     }
 
 

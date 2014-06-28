@@ -84,8 +84,11 @@
     <script type="text/javascript" src="/resources/jquery.js"></script>
     <script type="text/javascript" src="/resources/jquery-ui.js"></script>
     <script type="text/javascript" src="/resources/FileSaver.js"></script>
+
     <script type="text/javascript" src="/resources/canvas-toBlob.js"></script>
+    <script type="text/javascript" src="/resources/Blob.js"></script>
     <script type="text/javascript" src="/resources/saveSvgAsPng.js"></script>
+    <script type="text/javascript" src="/resources/saveSvgAsPngIE.js"></script>
 
 
 
